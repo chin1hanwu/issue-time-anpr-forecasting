@@ -5,3 +5,10 @@ PyYAML==6.0.2
 scikit-learn==1.6.1
 scipy==1.10.1
 torch==2.7.1
+# Second-revision scripts: threadpoolctl is imported directly by
+# r2_experiment_runner.py; matplotlib is only needed for the figure step in
+# scripts/r2_supplement.py and r2_window5.py. Lower bounds (not exact pins):
+# the private repo records no versions for these two, and the exact versions
+# installed alongside the pinned stack vary by platform.
+threadpoolctl>=3.1.0
+matplotlib>=3.8

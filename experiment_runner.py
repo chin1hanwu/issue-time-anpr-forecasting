@@ -20,6 +20,7 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.linear_model import Ridge
 
 from data_processing import (
+    _resolve_data_path,
     compute_rolling_features,
     create_trajectory_indexed_dataset,
     load_and_preprocess_data,
@@ -1920,8 +1921,11 @@ def freeze_selection():
         ROOT / "forecast_models.py",
         ROOT / "probabilistic_metrics.py",
         ROOT / "docs" / "experiment_protocol.md",
-        Path(base["data"]["plate1_path"]),
-        Path(base["data"]["plate2_path"]),
+        # Resolve the input tables the same way the data loader does, so the
+        # freeze hash covers the files actually read (relative paths resolve
+        # under data/; see data_processing._resolve_data_path).
+        _resolve_data_path(base["data"]["plate1_path"]),
+        _resolve_data_path(base["data"]["plate2_path"]),
     ]
     all_paths = sorted(
         {path.resolve() for path in artifact_paths + source_paths}, key=str

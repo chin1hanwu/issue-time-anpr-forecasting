@@ -1,25 +1,61 @@
-# Availability-Aware ANPR Forecasting
+# Issue-Time ANPR Forecasting
 
-This repository contains the code used for the experiments
-in "Availability-Aware Probabilistic Travel Time Forecasting and Service-Level
-Reliability for an ANPR-Instrumented Urban Arterial."
+Code for the experiments in "Issue-Time Probabilistic Travel Time
+Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"
+(Hanwu Qin, Dianhai Wang, Meng Zhang, Shenao Bao; College of Civil
+Engineering and Architecture, Zhejiang University), accepted in
+*Transportation Research Part C: Emerging Technologies* on 2026-11-18
+(manuscript TRC-26-01835R3). No DOI has been assigned yet; the citation in
+`CITATION.cff` will be updated when one is available.
 
-The implementation covers completion-aware ANPR preprocessing, complete-period
-chronological splitting, snapshot and recurrent mixture density networks,
-quantile gradient-boosted trees, validation-only model and policy selection,
-positive-support diagnostics, moving-period-block inference, frozen test
-evaluation, service-level reliability metrics, and CPU inference benchmarking.
+This repository was formerly named `availability-aware-anpr-forecasting`;
+its new name is `issue-time-anpr-forecasting`
+(`https://github.com/chin1hanwu/issue-time-anpr-forecasting`).
+The old URL, `https://github.com/chin1hanwu/availability-aware-anpr-forecasting`,
+redirects here after the rename; the data-availability statement in the
+published paper points to the old URL and keeps working.
+
+## What the paper finds
+
+Using 113,006 matched trajectories from a Hangzhou signalized arterial, the
+paper asks whether a probabilistic forecast built only from information
+available at the issue time can be accurate and reliable, and which
+components achieve this. Headline results:
+
+- Across seven cadence/window settings (2- to 10-minute update intervals,
+  5- to 60-minute entry windows), separately tuned comparisons detect no
+  look-ahead CRPS improvement from adding completions up to 30 minutes
+  later; 95% block intervals bound the gain at 0.272 s, as expected for a
+  corridor travel time of about 81 s.
+- Explicit-lag quantile boosting improves CRPS over a recurrent mixture
+  density network by 1.487 s (Holm-adjusted p = 0.003), and mixture-density
+  training improves a shared recurrent encoder by 1.630 s.
+- Directly fitted 0.05/0.95 interval endpoints with uniform scaling attain
+  period-weighted coverage 0.908 at width 41.9 s, and at a common
+  validation target give intervals 27.3 s narrower than an availability
+  gate.
+
+The implementation covers completion-aware ANPR preprocessing,
+complete-period chronological splitting, snapshot and recurrent mixture
+density networks, quantile gradient-boosted trees, validation-only model
+and policy selection, positive-support diagnostics, moving-period-block
+inference, frozen test evaluation, service-level reliability metrics, CPU
+inference benchmarking, and the second-revision analyses (directly fitted
+endpoints, service-policy comparison, cadence/window sensitivity, and
+variant-specific feature ablations).
 
 ## Privacy and release boundary
 
 The original ANPR event records and metadata remain governed by the data
 provider under applicable privacy constraints. The configuration files use
-generic camera identifiers and relative input paths.
+generic camera identifiers and relative input paths, and this repository
+contains no original or derived ANPR records.
 
 The paper's exact split counts and experiment grids are retained in
 `experiment_config.yaml`. Reproducing the reported numerical results
-requires authorized access to the original records. The included unit tests and
-synthetic event generator exercise the public interfaces with synthetic records.
+requires authorized access to the original records. The included unit tests
+and synthetic event generator exercise the public interfaces with synthetic
+records only.
 
 ## Repository contents
 
@@ -31,16 +67,37 @@ synthetic event generator exercise the public interfaces with synthetic records.
 - `experiment_runner.py`: training/validation selection stages and
   selection freezing.
 - `frozen_evaluation.py`: one-shot frozen test evaluation and service KPIs.
+- `r2_experiment_runner.py`: second-revision analyses — directly fitted
+  interval endpoints, service-policy comparison, and cadence/window
+  sensitivity. Reads only the frozen artifacts under
+  `outputs/paper_results/`, except for the sensitivity stage, which re-reads
+  the configured input tables.
+- `ablation_retuned.py`: feature ablations with variant-specific tuning on
+  validation mean pinball loss.
+- `gate_selectivity.py`: diagnostic that re-aggregates the published
+  per-case service file to test whether the selected gate identifies
+  unreliable periods or only widens intervals. No model is refitted.
+- `r2_window5.py`: the seventh cadence/window setting (5-minute update
+  interval, 5-minute entry window), run with the same procedure as the six
+  frozen settings.
 - `scripts/benchmark_inference.py`: CPU inference benchmark used in
   the computational-efficiency experiment.
-- `docs/experiment_protocol.md`: execution order and data-use boundaries.
-- `tests/`: deterministic synthetic unit tests.
+- `scripts/r2_supplement.py`: recomputation of the validation ablation and
+  endpoint differences, full-support block resampling, and the
+  second-revision figures.
+- `docs/experiment_protocol.md`: execution order and data-use boundaries,
+  including the second-revision additions.
+- `tests/`: deterministic synthetic unit tests, including the
+  second-revision boundary tests (`test_r2_experiments.py`,
+  `test_service_kpi_granularity.py`).
 
 ## Environment
 
 The reported experiments used Python 3.9, scikit-learn 1.6.1, and PyTorch
 2.7.1. Install the platform-appropriate PyTorch build when GPU training is
-required.
+required. `threadpoolctl` is required by `r2_experiment_runner.py` and
+`matplotlib` only by the figure step in `scripts/r2_supplement.py` and
+`r2_window5.py`.
 
 ```powershell
 conda activate tf_env
@@ -50,7 +107,9 @@ python -m pip install -r requirements.txt
 ## Input schema
 
 Set `plate1_path`, `plate2_path`, `camera_up`, and `camera_down` in
-`study_config.yaml`. Each event table must contain:
+`study_config.yaml`. Relative input paths resolve under `data/` (see
+`data_processing._resolve_data_path`); absolute paths are used as given.
+Each event table must contain:
 
 | Column | Meaning |
 | --- | --- |
@@ -114,6 +173,42 @@ python scripts/benchmark_inference.py
 The workflow writes generated artifacts under `outputs/paper_results/`, an
 ignored output directory.
 
+### Second-revision analyses
+
+Run these after the frozen evaluation. The runner freezes its plan and
+input manifest under `outputs/paper_results_r2/` on the first run and
+refuses to reuse artifacts if either changes; see
+`docs/experiment_protocol.md` for the data-use boundary.
+
+```powershell
+conda activate tf_env
+python r2_experiment_runner.py endpoints
+python r2_experiment_runner.py service
+python r2_experiment_runner.py sensitivity
+python ablation_retuned.py
+python scripts/r2_supplement.py
+python gate_selectivity.py outputs/paper_results/ap10/service_kpi_per_case.csv outputs/paper_results
+python r2_window5.py
+```
+
+`r2_experiment_runner.py` also accepts `all` to run the endpoints, service,
+and sensitivity stages in one go. `r2_window5.py` accepts `audit` (check the
+extension against the frozen manifest only) and `figure` (redraw the
+cadence/window figure with all seven settings only). The second-revision
+outputs go to `outputs/paper_results_r2/` and `outputs/paper_results_r2_w5/`,
+both ignored output directories.
+
+## Citation
+
+If you use this code, please cite the associated paper (accepted manuscript;
+volume, pages and DOI to be added when assigned):
+
+> Qin, H., Wang, D., Zhang, M., & Bao, S. (2026). Issue-Time Probabilistic
+> Travel Time Forecasting under Completion Delay for an ANPR-Instrumented
+> Urban Arterial. *Transportation Research Part C: Emerging Technologies*.
+
+See `CITATION.cff` for the machine-readable citation.
+
 ## License
 
-The code is released under the MIT License. See `LICENSE`.
+The code is released under the Apache License 2.0. See `LICENSE`.
