@@ -3,17 +3,17 @@
 Code for the experiments in "Issue-Time Probabilistic Travel Time
 Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"
 (Hanwu Qin, Dianhai Wang, Meng Zhang, Shenao Bao; College of Civil
-Engineering and Architecture, Zhejiang University), accepted in
-*Transportation Research Part C: Emerging Technologies* on 2026-11-18
-(manuscript TRC-26-01835R3). No DOI has been assigned yet; the citation in
-`CITATION.cff` will be updated when one is available.
+Engineering and Architecture, Zhejiang University), published in
+*Transportation Research Part C: Emerging Technologies* 195, 106177
+(2027), https://doi.org/10.1016/j.trc.2026.106177
+(manuscript TRC-26-01835R3, accepted 2026-11-18).
 
 This repository was formerly named `availability-aware-anpr-forecasting`;
 its new name is `issue-time-anpr-forecasting`
 (`https://github.com/chin1hanwu/issue-time-anpr-forecasting`).
 The old URL, `https://github.com/chin1hanwu/availability-aware-anpr-forecasting`,
 redirects here after the rename; the data-availability statement in the
-published paper points to the old URL and keeps working.
+published paper points to this repository.
 
 ## What the paper finds
 
@@ -200,12 +200,12 @@ both ignored output directories.
 
 ## Citation
 
-If you use this code, please cite the associated paper (accepted manuscript;
-volume, pages and DOI to be added when assigned):
+If you use this code, please cite the associated paper:
 
-> Qin, H., Wang, D., Zhang, M., & Bao, S. (2026). Issue-Time Probabilistic
+> Qin, H., Wang, D., Zhang, M., & Bao, S. (2027). Issue-Time Probabilistic
 > Travel Time Forecasting under Completion Delay for an ANPR-Instrumented
-> Urban Arterial. *Transportation Research Part C: Emerging Technologies*.
+> Urban Arterial. *Transportation Research Part C: Emerging Technologies*,
+> *195*, 106177. https://doi.org/10.1016/j.trc.2026.106177
 
 See `CITATION.cff` for the machine-readable citation.
 
