@@ -17,10 +17,17 @@ authors:
     affiliation: "College of Civil Engineering and Architecture, Zhejiang University"
 repository-code: "https://github.com/chin1hanwu/issue-time-anpr-forecasting"
 license: Apache-2.0
-date-released: 2026-08-08
+date-released: "2026-08-08"
+keywords:
+  - "Urban arterial"
+  - "Automatic number plate recognition"
+  - "Probabilistic travel time forecasting"
+  - "Label availability"
+  - "Completion delay"
+  - "Prediction intervals"
 preferred-citation:
   type: article
-  title: "Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"
+  title: "Issue-time probabilistic travel time forecasting under completion delay for an ANPR-instrumented urban arterial"
   authors:
     - family-names: Qin
       given-names: Hanwu
@@ -34,5 +41,13 @@ preferred-citation:
   year: 2027
   volume: 195
   pages: "106177"
+  issn: "0968-090X"
   doi: 10.1016/j.trc.2026.106177
-  url: "https://doi.org/10.1016/j.trc.2026.106177"
+  url: "https://www.sciencedirect.com/science/article/pii/S0968090X26006625"
+  keywords:
+    - "Urban arterial"
+    - "Automatic number plate recognition"
+    - "Probabilistic travel time forecasting"
+    - "Label availability"
+    - "Completion delay"
+    - "Prediction intervals"
