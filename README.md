@@ -1,11 +1,11 @@
 # Issue-Time ANPR Forecasting
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.trc.2026.106177-0b5cad)](https://doi.org/10.1016/j.trc.2026.106177)
-[![Journal](https://img.shields.io/badge/TR--C-Vol.%20195%2C%20106177%20%282027%29-15607A)](https://doi.org/10.1016/j.trc.2026.106177)
+[![ScienceDirect](https://img.shields.io/badge/TR--C-Vol.%20195%2C%20106177%20%282027%29-15607A)](https://www.sciencedirect.com/science/article/pii/S0968090X26006625)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-287B58)](LICENSE)
 
-Official experiment code for **"Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"** (*Transportation Research Part C: Emerging Technologies*, 195, 106177, 2027).
+Official experiment code for **"Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"** (*Transportation Research Part C: Emerging Technologies*, 195, 106177, 2027 — [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0968090X26006625)).
 
 ---
 
@@ -32,8 +32,11 @@ In Automatic Number Plate Recognition (ANPR) corridors, upstream entry timestamp
 On 113,006 matched trajectories from a Hangzhou signalized arterial (mean corridor travel time $\approx 81\text{ s}$):
 
 - **No detectable look-ahead gain**: Across seven cadence/window settings ($\Delta_{\text{obs}} \in \{2, 5, 10\}\text{ min}$, $W \in \{5, 10, 15, 30, 60\}\text{ min}$), separately tuned comparisons detect no CRPS improvement from adding completions up to 30 minutes after the issue time (95% block intervals bound any gain at $\le 0.272\text{ s}$).
+- **Signal concentrates in completed mean travel time**: Feature ablations locate predictive value primarily in the completed travel-time mean ($\bar{y}$).
 - **Representation and density training matter**: Explicit-lag quantile GBDTs improve CRPS over the Recurrent MDN by $1.487\text{ s}$ (Holm-adjusted $p = 0.003$), and mixture-density training improves a shared recurrent encoder over MSE-based point training by $1.630\text{ s}$.
 - **Direct endpoints outperform availability gating**: Directly fitted $0.05/0.95$ quantile endpoints with validation-calibrated uniform scaling achieve period-weighted coverage $0.908$ at $41.9\text{ s}$ width, producing intervals $27.3\text{ s}$ narrower than an availability gate at a matched validation coverage target.
+
+*Practical takeaways:* On this corridor, issue-time forecasts can be published directly at the refresh cadence, explicit-lag learners should benchmark recurrent neural models, and uniform interval scaling is preferred over the tested availability gate.
 
 ---
 
@@ -207,14 +210,17 @@ python r2_window5.py
 If you use this code in your research, please cite:
 
 ```bibtex
-@article{qin2027issuetime,
-  title   = {Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial},
-  author  = {Qin, Hanwu and Wang, Dianhai and Zhang, Meng and Bao, Shenao},
-  journal = {Transportation Research Part C: Emerging Technologies},
-  volume  = {195},
-  pages   = {106177},
-  year    = {2027},
-  doi     = {10.1016/j.trc.2026.106177}
+@article{QIN2027106177,
+  title    = {Issue-time probabilistic travel time forecasting under completion delay for an ANPR-instrumented urban arterial},
+  author   = {Hanwu Qin and Dianhai Wang and Meng Zhang and Shenao Bao},
+  journal  = {Transportation Research Part C: Emerging Technologies},
+  volume   = {195},
+  pages    = {106177},
+  year     = {2027},
+  issn     = {0968-090X},
+  doi      = {https://doi.org/10.1016/j.trc.2026.106177},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0968090X26006625},
+  keywords = {Urban arterial, Automatic number plate recognition, Probabilistic travel time forecasting, Label availability, Completion delay, Prediction intervals}
 }
 ```
 
