@@ -1,214 +1,225 @@
 # Issue-Time ANPR Forecasting
 
-Code for the experiments in "Issue-Time Probabilistic Travel Time
-Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"
-(Hanwu Qin, Dianhai Wang, Meng Zhang, Shenao Bao; College of Civil
-Engineering and Architecture, Zhejiang University), published in
-*Transportation Research Part C: Emerging Technologies* 195, 106177
-(2027), https://doi.org/10.1016/j.trc.2026.106177
-(manuscript TRC-26-01835R3, accepted 2026-11-18).
+[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.trc.2026.106177-0b5cad)](https://doi.org/10.1016/j.trc.2026.106177)
+[![Journal](https://img.shields.io/badge/TR--C-Vol.%20195%2C%20106177%20%282027%29-15607A)](https://doi.org/10.1016/j.trc.2026.106177)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-Apache--2.0-287B58)](LICENSE)
 
-This repository was formerly named `availability-aware-anpr-forecasting`;
-its new name is `issue-time-anpr-forecasting`
-(`https://github.com/chin1hanwu/issue-time-anpr-forecasting`).
-The old URL, `https://github.com/chin1hanwu/availability-aware-anpr-forecasting`,
-redirects here after the rename; the data-availability statement in the
-published paper points to this repository.
+Official experiment code for **"Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"** (*Transportation Research Part C: Emerging Technologies*, 195, 106177, 2027).
 
-## What the paper finds
+---
 
-Using 113,006 matched trajectories from a Hangzhou signalized arterial, the
-paper asks whether a probabilistic forecast built only from information
-available at the issue time can be accurate and reliable, and which
-components achieve this. Headline results:
+## Overview
 
-- Across seven cadence/window settings (2- to 10-minute update intervals,
-  5- to 60-minute entry windows), separately tuned comparisons detect no
-  look-ahead CRPS improvement from adding completions up to 30 minutes
-  later; 95% block intervals bound the gain at 0.272 s, as expected for a
-  corridor travel time of about 81 s.
-- Explicit-lag quantile boosting improves CRPS over a recurrent mixture
-  density network by 1.487 s (Holm-adjusted p = 0.003), and mixture-density
-  training improves a shared recurrent encoder by 1.630 s.
-- Directly fitted 0.05/0.95 interval endpoints with uniform scaling attain
-  period-weighted coverage 0.908 at width 41.9 s, and at a common
-  validation target give intervals 27.3 s narrower than an availability
-  gate.
+In Automatic Number Plate Recognition (ANPR) corridors, upstream entry timestamps are known immediately at forecast issue time $t$, whereas downstream arrival labels arrive only after each vehicle finishes traversing the link. Evaluating or featurizing traffic state using eventual matches leaks post-issue-time information. This repository enforces strict **issue-time observability** end to end across preprocessing, complete-period chronological splitting, validation-only selection, and confirmatory test evaluation.
 
-The implementation covers completion-aware ANPR preprocessing,
-complete-period chronological splitting, snapshot and recurrent mixture
-density networks, quantile gradient-boosted trees, validation-only model
-and policy selection, positive-support diagnostics, moving-period-block
-inference, frozen test evaluation, service-level reliability metrics, CPU
-inference benchmarking, and the second-revision analyses (directly fitted
-endpoints, service-policy comparison, cadence/window sensitivity, and
-variant-specific feature ablations).
+### Key Components
 
-## Privacy and release boundary
+- **Completion-aware state representation** (`data_processing.py`): 14-dimensional features per discrete update step $\Delta_{\text{obs}}$—upstream entries ($N_{\text{up}}$), completed matches by $t$ ($N_{\text{match}}$), completion ratio ($R_{\text{comp}}$), completed travel-time mean ($\bar{y}$) and variance ($s_y^2$) with training-segment fallback defaults, plus cyclical time-of-day (2D) and day-of-week (7D) encodings.
+- **Probabilistic & point models** (`forecast_models.py`, `experiment_runner.py`, `r2_experiment_runner.py`):
+  - Snapshot and Recurrent Mixture Density Networks (MDNs)
+  - Shared-encoder point LSTM with training-residual Gaussian (`lstm_mse_gaussian`)
+  - Naive marginal and Ridge Gaussian reference baselines
+  - Quantile gradient-boosted trees (`HistGradientBoostingRegressor`) in snapshot, explicit-lag, quantile-induced Gaussian, and directly fitted $0.05/0.95$ interval-endpoint variants
+- **Statistical & service-level evaluation** (`probabilistic_metrics.py`, `frozen_evaluation.py`):
+  - Leakage-free chronological splitting along complete update-period boundaries
+  - Gap-respecting moving-period-block bootstrap confidence intervals and Holm–Bonferroni multiplicity adjustments
+  - Positive-support (zero-truncated) diagnostics alongside raw Gaussian/mixture scores
+  - Period-weighted vs. trajectory-weighted service KPIs for availability gating and uniform interval scaling
 
-The original ANPR event records and metadata remain governed by the data
-provider under applicable privacy constraints. The configuration files use
-generic camera identifiers and relative input paths, and this repository
-contains no original or derived ANPR records.
+### Headline Findings
 
-The paper's exact split counts and experiment grids are retained in
-`experiment_config.yaml`. Reproducing the reported numerical results
-requires authorized access to the original records. The included unit tests
-and synthetic event generator exercise the public interfaces with synthetic
-records only.
+On 113,006 matched trajectories from a Hangzhou signalized arterial (mean corridor travel time $\approx 81\text{ s}$):
 
-## Repository contents
+- **No detectable look-ahead gain**: Across seven cadence/window settings ($\Delta_{\text{obs}} \in \{2, 5, 10\}\text{ min}$, $W \in \{5, 10, 15, 30, 60\}\text{ min}$), separately tuned comparisons detect no CRPS improvement from adding completions up to 30 minutes after the issue time (95% block intervals bound any gain at $\le 0.272\text{ s}$).
+- **Representation and density training matter**: Explicit-lag quantile GBDTs improve CRPS over the Recurrent MDN by $1.487\text{ s}$ (Holm-adjusted $p = 0.003$), and mixture-density training improves a shared recurrent encoder over MSE-based point training by $1.630\text{ s}$.
+- **Direct endpoints outperform availability gating**: Directly fitted $0.05/0.95$ quantile endpoints with validation-calibrated uniform scaling achieve period-weighted coverage $0.908$ at $41.9\text{ s}$ width, producing intervals $27.3\text{ s}$ narrower than an availability gate at a matched validation coverage target.
 
-- `data_processing.py`: event matching, availability-aware features,
-  trajectory alignment, and complete-period splitting.
-- `forecast_models.py`: snapshot and recurrent neural models and training code.
-- `probabilistic_metrics.py`: probabilistic scores, support corrections, block
-  resampling, and multiplicity-aware utilities.
-- `experiment_runner.py`: training/validation selection stages and
-  selection freezing.
-- `frozen_evaluation.py`: one-shot frozen test evaluation and service KPIs.
-- `r2_experiment_runner.py`: second-revision analyses — directly fitted
-  interval endpoints, service-policy comparison, and cadence/window
-  sensitivity. Reads only the frozen artifacts under
-  `outputs/paper_results/`, except for the sensitivity stage, which re-reads
-  the configured input tables.
-- `ablation_retuned.py`: feature ablations with variant-specific tuning on
-  validation mean pinball loss.
-- `gate_selectivity.py`: diagnostic that re-aggregates the published
-  per-case service file to test whether the selected gate identifies
-  unreliable periods or only widens intervals. No model is refitted.
-- `r2_window5.py`: the seventh cadence/window setting (5-minute update
-  interval, 5-minute entry window), run with the same procedure as the six
-  frozen settings.
-- `scripts/benchmark_inference.py`: CPU inference benchmark used in
-  the computational-efficiency experiment.
-- `scripts/r2_supplement.py`: recomputation of the validation ablation and
-  endpoint differences, full-support block resampling, and the
-  second-revision figures.
-- `docs/experiment_protocol.md`: execution order and data-use boundaries,
-  including the second-revision additions.
-- `tests/`: deterministic synthetic unit tests, including the
-  second-revision boundary tests (`test_r2_experiments.py`,
-  `test_service_kpi_granularity.py`).
+---
 
-## Environment
+## Experiment Pipeline
 
-The reported experiments used Python 3.9, scikit-learn 1.6.1, and PyTorch
-2.7.1. Install the platform-appropriate PyTorch build when GPU training is
-required. `threadpoolctl` is required by `r2_experiment_runner.py` and
-`matplotlib` only by the figure step in `scripts/r2_supplement.py` and
-`r2_window5.py`.
+All model architectures, mixture counts ($K^*$), block lengths, and gating/scaling rules are selected strictly on training and validation data and locked with SHA-256 hashes before touching the test split once.
 
-```powershell
-conda activate tf_env
+```mermaid
+flowchart TD
+    Data["Raw ANPR CSVs + YAML Configs"] --> Prepare["prepare (g0 complete-period split & scalers)"]
+
+    Prepare --> StageA["stage-a (Snapshot & Recurrent MDN grid)"]
+    Prepare --> FixedRef["fixed-references (Naive & Ridge)"]
+    Prepare --> TreesSnap["trees --kind snapshot"]
+    Prepare --> TreesLag["trees --kind lagged"]
+
+    TreesSnap --> AP03["ap03 (Induced Gaussian & zero-truncation check)"]
+    TreesSnap --> AP01["ap01 (Delay diagnostics & feature ablations)"]
+
+    StageA --> StageB["stage-b (Finalists, 1-SE selection & AP-09 block length)"]
+    FixedRef --> StageB
+    AP03 --> StageB
+
+    StageB --> KScan["k-scan (AP-04 mixture count K*)"]
+    StageB --> AP06["ap06 (Service gate policy selection)"]
+    AP03 --> AP06
+    AP01 --> AP06
+
+    StageB --> FinalModels["final-models (4-seed MDNs & LSTM-MSE)"]
+    KScan --> FinalModels
+
+    FinalModels --> Freeze["freeze (SHA-256 selection_lock.json)"]
+    TreesLag --> Freeze
+    AP06 --> Freeze
+
+    Freeze --> Eval["frozen_evaluation.py (One-shot test scoring)"]
+    Eval --> Bench["scripts/benchmark_inference.py (CPU latency)"]
+    Eval --> Extended["Extended analyses (endpoints, service, sensitivity, retuned ablation, gate selectivity)"]
+```
+
+---
+
+## Installation & Quickstart
+
+### 1. Environment Setup
+
+Experiments in the paper were run with Python 3.9, `scikit-learn==1.6.1`, and `torch==2.7.1`. Create a virtual environment and install dependencies (install the CUDA-appropriate PyTorch wheel separately if GPU training is desired):
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
 ```
 
-## Input schema
+### 2. Verify Interfaces with Synthetic Data & Tests
 
-Set `plate1_path`, `plate2_path`, `camera_up`, and `camera_down` in
-`study_config.yaml`. Relative input paths resolve under `data/` (see
-`data_processing._resolve_data_path`); absolute paths are used as given.
-Each event table must contain:
+Generate synthetic upstream/downstream ANPR tables matching the default configuration in `study_config.yaml` and run the deterministic unit test suite:
 
-| Column | Meaning |
-| --- | --- |
-| `leave_time` | Event timestamp parseable by pandas |
-| `vehicle_id` | Identifier used only for upstream/downstream matching |
-| `camera_id` | Camera identifier used by the configured corridor filter |
-| `turn_id` | Movement identifier; the study filter uses value `2` |
-
-Vehicle and camera identifiers must be handled according to the applicable
-data-governance agreement. Keep event tables and generated outputs outside
-version control.
-
-The synthetic generator illustrates this schema with fictional identifiers:
-
-```powershell
-conda activate tf_env
+```bash
 python examples/generate_synthetic_events.py
+python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-The synthetic files support interface checks; authorized original records are
-required to reproduce the paper's sample size and results.
+> **Note:** The synthetic files under `data/` verify data alignment, complete-period splitting, probabilistic scoring, interval construction, block resampling, and service KPI aggregation. Running the full `experiment_runner.py prepare` pipeline asserts the paper's exact split counts in `experiment_config.yaml` (`expected_split`) and therefore requires authorized original records (or an adapted `expected_split` configuration).
 
-## Tests
+---
 
-```powershell
-conda activate tf_env
-python -m unittest discover -s tests -p "test_*.py"
-```
+## Data Governance & Input Schema
 
-## Reproducing the experiment workflow
+Original ANPR event records, vehicle IDs, and camera metadata remain governed by the data provider and are **not** included in this repository. Keep all raw tables and generated artifacts (`data/`, `outputs/`) outside version control.
 
-After placing authorized input tables at the configured paths, execute the
-development stages in order. All model, threshold, and block-length choices use
-training and validation data only.
+Configure `plate1_path`, `plate2_path`, `camera_up`, and `camera_down` in `study_config.yaml`. Relative paths resolve under `data/` (overridable via the `LSTM_MDN_DATA_DIR` environment variable); absolute paths are used as given.
 
-```powershell
-conda activate tf_env
+| Column | Description |
+| --- | --- |
+| `leave_time` | Detection timestamp parseable by `pandas.to_datetime` |
+| `vehicle_id` | Vehicle identifier used solely for upstream/downstream matching |
+| `camera_id` | Camera identifier matched against `camera_up` / `camera_down` |
+| `turn_id` | Movement identifier (the study corridor filter selects `turn_id == 2`) |
+
+---
+
+## Reproducing the Paper Workflow
+
+### 1. Validation-Only Development & Freeze
+
+Run the development stages in dependency order below (`stage-b` requires validation predictions from `fixed-references`, `trees --kind snapshot`, and `ap03` to select the AP-09 block length; `ap06` requires `ap01` delay diagnostics):
+
+```bash
 python experiment_runner.py prepare
 python experiment_runner.py stage-a --family snapshot
 python experiment_runner.py stage-a --family recurrent
-python experiment_runner.py stage-b
-python experiment_runner.py k-scan
 python experiment_runner.py fixed-references
 python experiment_runner.py trees --kind snapshot
 python experiment_runner.py trees --kind lagged
 python experiment_runner.py ap03
+python experiment_runner.py stage-b
+python experiment_runner.py k-scan
 python experiment_runner.py ap01
 python experiment_runner.py ap06
 python experiment_runner.py final-models
 python experiment_runner.py freeze
 ```
 
-Open the frozen test set once, then run the CPU benchmark:
+*(Long-running neural searches in `stage-a`, `stage-b`, `k-scan`, `trees`, `ap01`, and `final-models` support `--limit N` for resumable batched execution.)*
 
-```powershell
-conda activate tf_env
+### 2. Frozen Test Evaluation & Inference Benchmark
+
+Once `outputs/paper_results/freeze/selection_lock.json` is written, score the held-out test set once and benchmark single-state CPU inference latency:
+
+```bash
 python frozen_evaluation.py
 python scripts/benchmark_inference.py
 ```
 
-The workflow writes generated artifacts under `outputs/paper_results/`, an
-ignored output directory.
+All main-experiment artifacts are written under `outputs/paper_results/`.
 
-### Second-revision analyses
+### 3. Extended Analyses & Diagnostics
 
-Run these after the frozen evaluation. The runner freezes its plan and
-input manifest under `outputs/paper_results_r2/` on the first run and
-refuses to reuse artifacts if either changes; see
-`docs/experiment_protocol.md` for the data-use boundary.
+Run after `frozen_evaluation.py` completes. The extended runner freezes `plan.json` and `input_manifest.json` under `outputs/paper_results_r2/` on its first run and refuses to reuse artifacts if inputs or plans diverge:
 
-```powershell
-conda activate tf_env
+```bash
+# Direct 0.05/0.95 endpoints, service policy comparison, and 6-setting cadence/window sensitivity
+# (`endpoints` must run before `service`; or run all three with: python r2_experiment_runner.py all)
 python r2_experiment_runner.py endpoints
 python r2_experiment_runner.py service
 python r2_experiment_runner.py sensitivity
+
+# Feature ablations with variant-specific validation tuning vs. fixed configuration
 python ablation_retuned.py
+
+# Validation recomputation, full-support block resampling, and publication figures
 python scripts/r2_supplement.py
+
+# Gate selectivity diagnostic (re-aggregates published per-case service KPIs without refitting)
 python gate_selectivity.py outputs/paper_results/ap10/service_kpi_per_case.csv outputs/paper_results
+
+# Seventh cadence/window setting (5-min update interval, 5-min window) -> outputs/paper_results_r2_w5/
 python r2_window5.py
 ```
 
-`r2_experiment_runner.py` also accepts `all` to run the endpoints, service,
-and sensitivity stages in one go. `r2_window5.py` accepts `audit` (check the
-extension against the frozen manifest only) and `figure` (redraw the
-cadence/window figure with all seven settings only). The second-revision
-outputs go to `outputs/paper_results_r2/` and `outputs/paper_results_r2_w5/`,
-both ignored output directories.
+`r2_window5.py` also supports `audit` (check provenance against the frozen manifest only) and `figure` (redraw the seven-setting cadence/window figure only). See [docs/experiment_protocol.md](docs/experiment_protocol.md) for full details on data-use boundaries.
+
+---
+
+## Repository Structure
+
+| Category | Path | Purpose |
+| --- | --- | --- |
+| **Core Library** | `data_processing.py` | Event matching, issue-time rolling features, trajectory alignment, complete-period split |
+| | `forecast_models.py` | Snapshot MDN, Recurrent MDN, Recurrent point LSTM, training & inference loops |
+| | `probabilistic_metrics.py` | Mixture/Gaussian CRPS & NLL, zero-truncated support scores, segmented ACF, block bootstrap |
+| **Main Pipeline** | `experiment_runner.py` | Chronological split, dev grid searches, policy/block selection, SHA-256 selection freeze |
+| | `frozen_evaluation.py` | One-shot test scoring, paired Holm-adjusted effects, AP-01/03/04/06/09/10 outputs |
+| | `scripts/benchmark_inference.py` | Single-state CPU latency, parameter/tree complexity, and model size benchmark |
+| **Extended Analyses** | `r2_experiment_runner.py` | Direct endpoints, gate vs. uniform scaling comparison, cadence/window sensitivity |
+| | `ablation_retuned.py` | Retuned vs. fixed-hyperparameter feature ablations on validation pinball loss |
+| | `scripts/r2_supplement.py` | Validation/endpoint recomputation, full-support block intervals, figure generation |
+| | `r2_window5.py` | `(5 min, 5 min)` cadence/window extension and combined 7-setting plot |
+| | `gate_selectivity.py` | Period-level gate selectivity vs. matched-budget random gate & uniform widening |
+| **Config & Docs** | `study_config.yaml` | Input paths, camera/turn filters, cadence/window defaults, split ratios |
+| | `experiment_config.yaml` | Protocol version, expected split counts, model grids, selection & bootstrap config |
+| | `docs/experiment_protocol.md` | Stage specifications and data-use boundaries |
+| **Examples & Tests** | `examples/generate_synthetic_events.py` | Synthetic ANPR CSV generator for interface verification |
+| | `tests/test_*.py` | Unit tests for splitting, model shapes, metrics, evaluation, and KPI weighting |
+
+---
 
 ## Citation
 
-If you use this code, please cite the associated paper:
+If you use this code in your research, please cite:
 
-> Qin, H., Wang, D., Zhang, M., & Bao, S. (2027). Issue-Time Probabilistic
-> Travel Time Forecasting under Completion Delay for an ANPR-Instrumented
-> Urban Arterial. *Transportation Research Part C: Emerging Technologies*,
-> *195*, 106177. https://doi.org/10.1016/j.trc.2026.106177
+```bibtex
+@article{qin2027issuetime,
+  title   = {Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial},
+  author  = {Qin, Hanwu and Wang, Dianhai and Zhang, Meng and Bao, Shenao},
+  journal = {Transportation Research Part C: Emerging Technologies},
+  volume  = {195},
+  pages   = {106177},
+  year    = {2027},
+  doi     = {10.1016/j.trc.2026.106177}
+}
+```
 
-See `CITATION.cff` for the machine-readable citation.
+Machine-readable metadata is also provided in [CITATION.cff](CITATION.cff).
 
 ## License
 
-The code is released under the Apache License 2.0. See `LICENSE`.
+Released under the [Apache License 2.0](LICENSE).
