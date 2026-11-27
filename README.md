@@ -2,10 +2,11 @@
 
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.trc.2026.106177-0b5cad)](https://doi.org/10.1016/j.trc.2026.106177)
 [![ScienceDirect](https://img.shields.io/badge/TR--C-Vol.%20195%2C%20106177%20%282027%29-15607A)](https://www.sciencedirect.com/science/article/pii/S0968090X26006625)
+[![Project Page](https://img.shields.io/badge/Project%20Page-Interactive%20Summary-287B58)](https://chin1hanwu.github.io/issue-time-anpr-forecasting/)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-287B58)](LICENSE)
 
-Official experiment code for **"Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"** (*Transportation Research Part C: Emerging Technologies*, 195, 106177, 2027 — [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0968090X26006625)).
+Official experiment code for **"Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial"** (*Transportation Research Part C: Emerging Technologies*, 195, 106177, 2027 — [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0968090X26006625) | [Project Page](https://chin1hanwu.github.io/issue-time-anpr-forecasting/) · [Source](docs/index.html)).
 
 ---
 
@@ -200,6 +201,7 @@ python r2_window5.py
 | **Config & Docs** | `study_config.yaml` | Input paths, camera/turn filters, cadence/window defaults, split ratios |
 | | `experiment_config.yaml` | Protocol version, expected split counts, model grids, selection & bootstrap config |
 | | `docs/experiment_protocol.md` | Stage specifications and data-use boundaries |
+| | `docs/index.html` | Companion GitHub Pages project website with interactive findings |
 | **Examples & Tests** | `examples/generate_synthetic_events.py` | Synthetic ANPR CSV generator for interface verification |
 | | `tests/test_*.py` | Unit tests for splitting, model shapes, metrics, evaluation, and KPI weighting |
 

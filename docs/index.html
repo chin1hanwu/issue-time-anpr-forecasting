@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Issue-Time Probabilistic Travel Time Forecasting under Completion Delay</title>
+  <meta name="description" content="Companion research page for Issue-Time Probabilistic Travel Time Forecasting under Completion Delay for an ANPR-Instrumented Urban Arterial (Transportation Research Part C, 2027).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #F7F9FB;
+      --bg-surface: #FFFFFF;
+      --bg-subtle: #EDF2F6;
+      --bg-marine: #0E1D27;
+      --bg-marine-elevated: #152936;
+      --text-primary: #0F1E28;
+      --text-muted: #4A5D6A;
+      --text-on-dark: #F3F7FA;
+      --text-on-dark-muted: #B6C7D2;
+      --accent: #15607A;
+      --accent-hover: #0F4B60;
+      --signal-amber: #B07622;
+      --signal-crimson: #AA4D45;
+      --signal-emerald: #287B58;
+      --border-light: rgba(15, 30, 40, 0.11);
+      --border-dark: rgba(243, 247, 250, 0.14);
+
+      --font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      /* Strictly 3 font sizes below the hero */
+      --text-heading: clamp(1.55rem, 2.5vw, 2.05rem);
+      --text-body: 1.0625rem;
+      --text-sm: 0.875rem;
+
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --container-max: 1120px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      line-height: 1.62;
+      color: var(--text-primary);
+      background-color: var(--bg-page);
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-inline: auto;
+      padding-inline: clamp(1.15rem, 4vw, 2.5rem);
+    }
+
+    /* Header */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background-color: rgba(234, 240, 244, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 180ms var(--ease-out), background-color 180ms var(--ease-out);
+    }
+
+    .site-header.scrolled {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-bottom-color: var(--border-light);
+    }
+
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      min-height: 4rem;
+    }
+
+    .brand-wordmark {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      white-space: nowrap;
+      color: var(--text-primary);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(0.9rem, 2.5vw, 1.75rem);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 160ms var(--ease-out);
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text-primary);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding-top: clamp(1.75rem, 3.5vw, 2.85rem);
+      padding-bottom: clamp(2.5rem, 5vw, 4rem);
+      background: linear-gradient(180deg, #EAF0F4 0%, #F7F9FB 100%);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .hero-header {
+      max-width: 920px;
+      margin-inline: auto;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 4.4vw, 3.75rem);
+      font-weight: 700;
+      line-height: 1.03;
+      letter-spacing: -0.035em;
+      color: var(--text-primary);
+    }
+
+    .hero-subtitle {
+      max-width: 58ch;
+      margin: 1rem auto 1.4rem;
+      font-size: var(--text-body);
+      color: var(--text-muted);
+    }
+
+    .primary-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.72rem 1.45rem;
+      border: 0;
+      border-radius: 8px;
+      background-color: var(--accent);
+      color: #FFFFFF;
+      font-family: var(--font-body);
+      font-size: var(--text-body);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 180ms var(--ease-out), transform 180ms var(--ease-out);
+    }
+
+    .primary-cta:hover,
+    .primary-cta:focus-visible {
+      background-color: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Interactive Observatory Stage */
+    .observatory {
+      margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: clamp(1.1rem, 2.5vw, 1.65rem);
+      box-shadow: 0 14px 36px rgba(15, 30, 40, 0.05);
+    }
+
+    .observatory-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .observatory-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      flex-wrap: wrap;
+      max-width: 100%;
+      padding: 3px;
+      background-color: var(--bg-subtle);
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      gap: 2px;
+    }
+
+    .segmented-control button {
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out);
+    }
+
+    .segmented-control button[aria-selected="true"] {
+      background-color: var(--bg-surface);
+      color: var(--text-primary);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(15, 30, 40, 0.08);
+    }
+
+    .observatory-body {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 1.5rem;
+      padding-top: 1.15rem;
+      align-items: center;
+    }
+
+    .observatory-body > *,
+    .findings-grid > *,
+    .protocol-layout > *,
+    .citation-grid > * {
+      min-width: 0;
+    }
+
+    .corridor-canvas-wrap {
+      width: 100%;
+    }
+
+    .corridor-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .slider-row label {
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+      min-width: 0;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .observatory-readout {
+      display: grid;
+      gap: 0.7rem;
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border-light);
+    }
+
+    .readout-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .readout-row:last-of-type {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .readout-label {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .readout-value {
+      font-family: var(--font-display);
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .readout-note {
+      margin: 0.2rem 0 0;
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    /* Section Defaults */
+    .section {
+      padding-block: clamp(3.25rem, 6.5vw, 5.25rem);
+    }
+
+    .section h2 {
+      margin: 0 0 0.9rem;
+      font-family: var(--font-display);
+      font-size: var(--text-heading);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+    }
+
+    .section-intro {
+      max-width: 65ch;
+      margin: 0 0 2rem;
+      color: var(--text-muted);
+    }
+
+    /* Dark Marine Band: Empirical Findings */
+    .findings-band {
+      background-color: var(--bg-marine);
+      color: var(--text-on-dark);
+    }
+
+    .findings-band .section-intro {
+      color: var(--text-on-dark-muted);
+    }
+
+    .findings-band .segmented-control {
+      background-color: var(--bg-marine-elevated);
+      border-color: var(--border-dark);
+    }
+
+    .findings-band .segmented-control button {
+      color: var(--text-on-dark-muted);
+    }
+
+    .findings-band .segmented-control button[aria-selected="true"] {
+      background-color: var(--accent);
+      color: #FFFFFF;
+      box-shadow: none;
+    }
+
+    .findings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: clamp(1.75rem, 4vw, 3.25rem);
+      align-items: start;
+      margin-top: 2rem;
+    }
+
+    .finding-copy h3 {
+      margin: 0 0 0.75rem;
+      font-family: var(--font-display);
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--text-on-dark);
+    }
+
+    .finding-copy p {
+      margin: 0 0 1.25rem;
+      max-width: 60ch;
+      color: var(--text-on-dark-muted);
+    }
+
+    .metric-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .metric-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.35rem 1rem;
+      padding-block: 0.85rem;
+      border-bottom: 1px solid var(--border-dark);
+      font-size: var(--text-body);
+    }
+
+    .metric-list span:first-child {
+      color: var(--text-on-dark-muted);
+      font-size: var(--text-sm);
+    }
+
+    .metric-list strong {
+      font-family: var(--font-display);
+      font-weight: 600;
+      color: var(--text-on-dark);
+    }
+
+    .chart-stage {
+      background-color: var(--bg-marine-elevated);
+      border: 1px solid var(--border-dark);
+      border-radius: 12px;
+      padding: clamp(1rem, 2.5vw, 1.5rem);
+    }
+
+    .chart-caption {
+      margin: 0.85rem 0 0;
+      font-size: var(--text-sm);
+      color: var(--text-on-dark-muted);
+    }
+
+    /* Protocol & Leakage Guardrails */
+    .protocol-section {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .protocol-layout {
+      display: grid;
+      grid-template-columns: 0.95fr 1.25fr;
+      gap: clamp(1.75rem, 4vw, 3.25rem);
+      align-items: start;
+    }
+
+    .stage-tabs {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .stage-tab {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      text-align: left;
+      padding: 1rem 1.15rem;
+      background-color: transparent;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      transition: border-color 160ms var(--ease-out), background-color 160ms var(--ease-out);
+    }
+
+    .stage-tab:hover {
+      background-color: var(--bg-page);
+    }
+
+    .stage-tab[aria-selected="true"] {
+      background-color: var(--bg-subtle);
+      border-color: var(--accent);
+    }
+
+    .stage-tab-title {
+      font-family: var(--font-display);
+      font-size: var(--text-body);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .stage-tab-sub {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .stage-detail {
+      padding: clamp(1.25rem, 3vw, 2rem);
+      background-color: var(--bg-page);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+    }
+
+    .stage-detail h3 {
+      margin: 0 0 0.75rem;
+      font-family: var(--font-display);
+      font-size: var(--text-body);
+      font-weight: 600;
+    }
+
+    .stage-detail p {
+      margin: 0 0 1.15rem;
+      color: var(--text-muted);
+      max-width: 65ch;
+    }
+
+    .detail-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    .detail-table th,
+    .detail-table td {
+      text-align: left;
+      padding: 0.65rem 0.5rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+
+    .detail-table th {
+      color: var(--text-muted);
+      font-weight: 500;
+      width: 36%;
+    }
+
+    .detail-table td {
+      color: var(--text-primary);
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+
+    /* Split & Citation */
+    .citation-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.35fr;
+      gap: clamp(1.75rem, 4vw, 3.25rem);
+      align-items: start;
+    }
+
+    .venue-line {
+      margin: 0 0 1.15rem;
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .author-list {
+      list-style: none;
+      margin: 0 0 1.5rem;
+      padding: 0;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .author-list li {
+      padding-block: 0.65rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: var(--text-body);
+    }
+
+    .author-list span {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .bibtex-box {
+      background-color: var(--bg-marine);
+      color: var(--text-on-dark);
+      border-radius: 12px;
+      padding: 1.35rem 1.5rem;
+      overflow: hidden;
+    }
+
+    .bibtex-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .bibtex-head span {
+      font-size: var(--text-sm);
+      color: var(--text-on-dark-muted);
+    }
+
+    .bibtex-pre {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: var(--text-sm);
+      line-height: 1.55;
+      color: var(--text-on-dark);
+      white-space: pre;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border-light);
+      padding-block: 2rem;
+      background-color: var(--bg-surface);
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      transition: color 160ms var(--ease-out);
+    }
+
+    .footer-links a:hover {
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 900px) {
+      .observatory-body,
+      .findings-grid,
+      .protocol-layout,
+      .citation-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .observatory-readout {
+        padding-left: 0;
+        padding-top: 1rem;
+        border-left: 0;
+        border-top: 1px solid var(--border-light);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-bar {
+        flex-wrap: wrap;
+        padding-block: 0.65rem;
+      }
+
+      .nav-links {
+        gap: 0.95rem;
+      }
+
+      .slider-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.45rem;
+      }
+
+      .segmented-control {
+        width: 100%;
+      }
+
+      .segmented-control button {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+      .primary-cta,
+      .site-header,
+      .segmented-control button,
+      .stage-tab,
+      .nav-links a,
+      .footer-links a {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header" id="site-header">
+    <div class="container nav-bar">
+      <a class="brand-wordmark" href="#top">Issue-Time ANPR</a>
+      <ul class="nav-links">
+        <li><a href="#observatory">Observability</a></li>
+        <li><a href="#findings">Findings</a></li>
+        <li><a href="#protocol">Protocol</a></li>
+        <li><a href="#citation">Citation</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-header">
+          <h1>Issue-time travel time forecasting without future leakage</h1>
+          <p class="hero-subtitle">Probabilistic arterial travel-time forecasts built strictly from completions observed by the issue time match thirty-minute look-ahead accuracy.</p>
+          <a class="primary-cta" href="https://doi.org/10.1016/j.trc.2026.106177" target="_blank" rel="noopener noreferrer">Read the TR-C 2027 paper</a>
+        </div>
+
+        <div class="observatory" id="observatory">
+          <div class="observatory-toolbar">
+            <p class="observatory-title">Completion-delay state at forecast issue time t</p>
+            <div class="segmented-control" role="tablist" aria-label="Information set mode">
+              <button type="button" role="tab" id="mode-deployable" aria-selected="true">Deployable (h = 0 s)</button>
+              <button type="button" role="tab" id="mode-lookahead" aria-selected="false">Look-ahead (h = 1800 s)</button>
+            </div>
+          </div>
+
+          <div class="observatory-body">
+            <div class="corridor-canvas-wrap">
+              <svg class="corridor-svg" viewBox="0 0 640 198" role="img" aria-label="Upstream to downstream ANPR corridor completion diagram"></svg>
+              <div class="slider-row">
+                <label for="congestion-slider">Corridor travel-time level (mean ~81 s)</label>
+                <input id="congestion-slider" type="range" min="45" max="175" value="81" step="1">
+              </div>
+            </div>
+
+            <div class="observatory-readout" aria-live="polite">
+              <div class="readout-row">
+                <span class="readout-label">Upstream entries N_up</span>
+                <span class="readout-value" id="ro-nup">12</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">Observed completions N_match</span>
+                <span class="readout-value" id="ro-nmatch">9</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">Completion ratio R_comp</span>
+                <span class="readout-value" id="ro-rcomp">0.750</span>
+              </div>
+              <div class="readout-row">
+                <span class="readout-label">Completed mean travel time</span>
+                <span class="readout-value" id="ro-bary">81.0 s</span>
+              </div>
+              <p class="readout-note" id="ro-note">Only vehicles completing at or before t (solid teal) enter the feature vector.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section findings-band" id="findings">
+      <div class="container">
+        <h2>Three empirical findings from Hangzhou</h2>
+        <p class="section-intro">Evaluated across 113,006 matched trajectories on a signalized urban arterial using gap-respecting moving-period-block bootstrap inference and Holm-Bonferroni multiplicity adjustments.</p>
+
+        <div class="segmented-control" role="tablist" aria-label="Empirical findings selector">
+          <button type="button" role="tab" class="finding-tab" data-finding="lookahead" aria-selected="true">Look-ahead equivalence</button>
+          <button type="button" role="tab" class="finding-tab" data-finding="representation" aria-selected="false">Representation and density</button>
+          <button type="button" role="tab" class="finding-tab" data-finding="endpoints" aria-selected="false">Endpoints and gating</button>
+        </div>
+
+        <div class="findings-grid">
+          <div class="finding-copy" id="finding-copy"></div>
+          <div class="chart-stage">
+            <svg id="finding-chart" viewBox="0 0 560 290" style="width:100%;height:auto;display:block;" role="img" aria-label="Empirical results visualization"></svg>
+            <p class="chart-caption" id="finding-caption"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section protocol-section" id="protocol">
+      <div class="container">
+        <h2>Frozen evaluation protocol and guardrails</h2>
+        <p class="section-intro">Every architecture, mixture count, block length, and publication policy is fixed exclusively on training and validation periods before touching the held-out test set once.</p>
+
+        <div class="protocol-layout">
+          <div class="stage-tabs" role="tablist" aria-label="Protocol stages">
+            <button type="button" role="tab" class="stage-tab" data-stage="split" aria-selected="true">
+              <span class="stage-tab-title">Complete-period chronological split</span>
+              <span class="stage-tab-sub">79,113 train / 16,943 validation / 16,950 test</span>
+            </button>
+            <button type="button" role="tab" class="stage-tab" data-stage="selection" aria-selected="false">
+              <span class="stage-tab-title">Validation-only model and K* selection</span>
+              <span class="stage-tab-sub">1-SE rule, quantile GBDT grid, AP-09 block length</span>
+            </button>
+            <button type="button" role="tab" class="stage-tab" data-stage="freeze" aria-selected="false">
+              <span class="stage-tab-title">SHA-256 selection lock and one-shot test</span>
+              <span class="stage-tab-sub">Tamper-checked cache and single confirmatory batch</span>
+            </button>
+            <button type="button" role="tab" class="stage-tab" data-stage="extended" aria-selected="false">
+              <span class="stage-tab-title">Endpoint, scaling, and cadence extensions</span>
+              <span class="stage-tab-sub">Direct 0.05/0.95 intervals and 7 cadence/window pairs</span>
+            </button>
+          </div>
+
+          <div class="stage-detail" id="stage-detail"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="citation">
+      <div class="container">
+        <h2>Authors and citation</h2>
+        <p class="section-intro">Code is released under the Apache License 2.0. Original ANPR records remain governed by the data provider; synthetic event generators and unit tests verify all public interfaces.</p>
+
+        <div class="citation-grid">
+          <div>
+            <p class="venue-line">Transportation Research Part C: Emerging Technologies, Vol. 195, 106177 (2027)</p>
+            <ul class="author-list">
+              <li><strong>Hanwu Qin</strong><span>Zhejiang University</span></li>
+              <li><strong>Dianhai Wang</strong><span>Zhejiang University</span></li>
+              <li><strong>Meng Zhang</strong><span>Zhejiang University</span></li>
+              <li><strong>Shenao Bao</strong><span>Zhejiang University</span></li>
+            </ul>
+            <a class="primary-cta" href="https://github.com/chin1hanwu/issue-time-anpr-forecasting" target="_blank" rel="noopener noreferrer">Browse code on GitHub</a>
+          </div>
+
+          <div class="bibtex-box">
+            <div class="bibtex-head">
+              <span>Official ScienceDirect BibTeX (QIN2027106177)</span>
+              <button type="button" class="primary-cta" id="copy-bibtex" style="padding:0.45rem 0.95rem;font-size:0.875rem;">Copy BibTeX</button>
+            </div>
+            <pre class="bibtex-pre" id="bibtex-text">@article{QIN2027106177,
+  title    = {Issue-time probabilistic travel time forecasting under completion delay for an ANPR-instrumented urban arterial},
+  author   = {Hanwu Qin and Dianhai Wang and Meng Zhang and Shenao Bao},
+  journal  = {Transportation Research Part C: Emerging Technologies},
+  volume   = {195},
+  pages    = {106177},
+  year     = {2027},
+  issn     = {0968-090X},
+  doi      = {https://doi.org/10.1016/j.trc.2026.106177},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0968090X26006625},
+  keywords = {Urban arterial, Automatic number plate recognition, Probabilistic travel time forecasting, Label availability, Completion delay, Prediction intervals}
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>College of Civil Engineering and Architecture, Zhejiang University</span>
+      <div class="footer-links">
+        <a href="https://doi.org/10.1016/j.trc.2026.106177" target="_blank" rel="noopener noreferrer">DOI 10.1016/j.trc.2026.106177</a>
+        <a href="https://www.sciencedirect.com/science/article/pii/S0968090X26006625" target="_blank" rel="noopener noreferrer">ScienceDirect</a>
+        <a href="https://github.com/chin1hanwu/issue-time-anpr-forecasting" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+        <a href="https://github.com/chin1hanwu/issue-time-anpr-forecasting/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Apache-2.0 License</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const header = document.getElementById("site-header");
+      window.addEventListener("scroll", function () {
+        header.classList.toggle("scrolled", window.scrollY > 12);
+      }, { passive: true });
+
+      // 1. Completion-delay interactive observatory
+      const vehicles = [
+        { entryMin: -28.0, factor: 0.78 },
+        { entryMin: -25.0, factor: 0.94 },
+        { entryMin: -22.0, factor: 0.85 },
+        { entryMin: -19.0, factor: 1.05 },
+        { entryMin: -16.0, factor: 0.91 },
+        { entryMin: -13.0, factor: 1.12 },
+        { entryMin: -10.0, factor: 0.88 },
+        { entryMin: -7.0,  factor: 1.04 },
+        { entryMin: -4.2,  factor: 0.98 },
+        { entryMin: -2.2,  factor: 1.15 },
+        { entryMin: -1.1,  factor: 1.24 },
+        { entryMin: -0.3,  factor: 1.08 }
+      ];
+
+      let obsMode = "deployable";
+      const slider = document.getElementById("congestion-slider");
+      const svg = document.querySelector(".corridor-svg");
+      const roNup = document.getElementById("ro-nup");
+      const roNmatch = document.getElementById("ro-nmatch");
+      const roRcomp = document.getElementById("ro-rcomp");
+      const roBary = document.getElementById("ro-bary");
+      const roNote = document.getElementById("ro-note");
+      const btnDeploy = document.getElementById("mode-deployable");
+      const btnLook = document.getElementById("mode-lookahead");
+
+      function renderObservatory() {
+        const meanTt = Number(slider.value);
+        const cutoffMin = obsMode === "deployable" ? 0 : 30;
+        const nUp = vehicles.length;
+        const completed = [];
+
+        const ns = "http://www.w3.org/2000/svg";
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+        function el(tag, attrs, text) {
+          const node = document.createElementNS(ns, tag);
+          for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, String(v));
+          if (text !== undefined) node.textContent = text;
+          return node;
+        }
+
+        const x0 = 24, x1 = 616, yTop = 26, yBot = 166;
+        // Map [-30, +6] minutes across width so post-issue-time arrivals are visually distinct
+        const mapX = (minVal) => x0 + ((minVal + 30) / 36) * (x1 - x0);
+        const tX = mapX(0);
+
+        svg.appendChild(el("rect", { x: x0, y: yTop, width: tX - x0, height: yBot - yTop, fill: "#F4F7FA", rx: 6 }));
+        svg.appendChild(el("rect", {
+          x: tX, y: yTop, width: x1 - tX, height: yBot - yTop,
+          fill: obsMode === "lookahead" ? "rgba(176, 118, 34, 0.13)" : "rgba(15, 30, 40, 0.04)",
+          rx: 6
+        }));
+
+        svg.appendChild(el("line", { x1: tX, y1: yTop - 6, x2: tX, y2: yBot + 6, stroke: "#0F1E28", "stroke-width": 2 }));
+        svg.appendChild(el("text", { x: tX, y: 15, "text-anchor": "middle", fill: "#0F1E28", "font-size": 13, "font-weight": 600 }, "Issue time t"));
+        svg.appendChild(el("text", { x: x0, y: 187, "text-anchor": "start", fill: "#4A5D6A", "font-size": 12.5 }, "t - 30 min (entry window W)"));
+        svg.appendChild(el("text", { x: x1, y: 187, "text-anchor": "end", fill: "#4A5D6A", "font-size": 12.5 }, "Later downstream arrivals"));
+
+        vehicles.forEach((v, idx) => {
+          const ttSec = meanTt * v.factor;
+          const downMin = v.entryMin + ttSec / 60;
+          const isCompletedAtT = downMin <= 0;
+          const isIncluded = downMin <= cutoffMin;
+          if (isIncluded) completed.push(ttSec);
+
+          const rowY = yTop + 11 + idx * 10.6;
+          const sx = mapX(v.entryMin);
+          const ex = Math.min(mapX(downMin), x1 - 6);
+          const color = isCompletedAtT ? "#15607A" : (isIncluded ? "#B07622" : "#9AAAB5");
+
+          svg.appendChild(el("line", {
+            x1: sx, y1: rowY, x2: ex, y2: rowY,
+            stroke: color, "stroke-width": 2.4,
+            "stroke-dasharray": isCompletedAtT ? "none" : "4 3"
+          }));
+          svg.appendChild(el("circle", { cx: sx, cy: rowY, r: 2.8, fill: color }));
+          svg.appendChild(el("circle", {
+            cx: ex, cy: rowY, r: 3.1,
+            fill: isIncluded ? color : "#FFFFFF",
+            stroke: color, "stroke-width": 1.6
+          }));
+        });
+
+        const nMatch = completed.length;
+        const rComp = nMatch / nUp;
+        const barY = nMatch > 0 ? completed.reduce((a, b) => a + b, 0) / nMatch : 81.8;
+
+        roNup.textContent = String(nUp);
+        roNmatch.textContent = String(nMatch);
+        roRcomp.textContent = rComp.toFixed(3);
+        roBary.textContent = barY.toFixed(1) + " s";
+        roNote.textContent = obsMode === "deployable"
+          ? "Only vehicles completing at or before t (solid teal) enter the feature vector."
+          : "Counterfactual adds late-arriving vehicles up to t + 30 min (dashed amber).";
+      }
+
+      btnDeploy.addEventListener("click", function () {
+        obsMode = "deployable";
+        btnDeploy.setAttribute("aria-selected", "true");
+        btnLook.setAttribute("aria-selected", "false");
+        renderObservatory();
+      });
+
+      btnLook.addEventListener("click", function () {
+        obsMode = "lookahead";
+        btnLook.setAttribute("aria-selected", "true");
+        btnDeploy.setAttribute("aria-selected", "false");
+        renderObservatory();
+      });
+
+      slider.addEventListener("input", renderObservatory);
+      renderObservatory();
+
+      // 2. Three Findings Interactive Stage
+      const findingsData = {
+        lookahead: {
+          heading: "Issue-time forecasts match thirty-minute look-ahead",
+          body: "Across seven cadence and entry-window combinations, separately tuned snapshot quantile GBDTs detect no CRPS improvement from adding completions arriving up to 30 minutes after the issue time. Feature ablations locate predictive value primarily in the completed travel-time mean.",
+          metrics: [
+            ["Tested cadence/window grid", "7 settings (2 to 10 min; 5 to 60 min)"],
+            ["95% block bound on look-ahead gain", "<= 0.272 s CRPS"],
+            ["Primary predictive signal", "Completed travel-time mean"]
+          ],
+          caption: "Seven evaluated (update interval, entry window) settings across deployable vs. 30-min look-ahead comparisons.",
+          drawChart: function (svgEl) {
+            const settings = [
+              { label: "d=2, W=30", d: 2, w: 30 },
+              { label: "d=5, W=5",  d: 5, w: 5 },
+              { label: "d=5, W=10", d: 5, w: 10 },
+              { label: "d=5, W=15", d: 5, w: 15 },
+              { label: "d=5, W=30", d: 5, w: 30 },
+              { label: "d=5, W=60", d: 5, w: 60 },
+              { label: "d=10, W=30", d: 10, w: 30 }
+            ];
+            const ns = "http://www.w3.org/2000/svg";
+            while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+            const el = (t, a, txt) => {
+              const n = document.createElementNS(ns, t);
+              for (const [k, v] of Object.entries(a)) n.setAttribute(k, String(v));
+              if (txt !== undefined) n.textContent = txt;
+              return n;
+            };
+
+            svgEl.appendChild(el("text", { x: 20, y: 26, fill: "#F3F7FA", "font-size": 14, "font-weight": 600 }, "Seven cadence and entry-window configurations"));
+            svgEl.appendChild(el("text", { x: 20, y: 48, fill: "#B6C7D2", "font-size": 12.5 }, "150-min gap-respecting blocks; 95% block bound on look-ahead gain <= 0.272 s"));
+
+            settings.forEach((s, i) => {
+              const y = 74 + i * 29;
+              const barW = (s.w / 60) * 290;
+              svgEl.appendChild(el("text", { x: 20, y: y + 14, fill: "#B6C7D2", "font-size": 13 }, s.label));
+              svgEl.appendChild(el("rect", { x: 128, y: y + 2, width: 290, height: 14, rx: 4, fill: "rgba(243,247,250,0.08)" }));
+              svgEl.appendChild(el("rect", { x: 128, y: y + 2, width: barW, height: 14, rx: 4, fill: s.d === 5 && s.w === 30 ? "#B07622" : "#15607A" }));
+              svgEl.appendChild(el("text", { x: 432, y: y + 14, fill: "#F3F7FA", "font-size": 13 }, "W = " + s.w + " min"));
+            });
+          }
+        },
+        representation: {
+          heading: "Explicit-lag learners benchmark recurrent networks",
+          body: "Flattening explicit historical lags inside a quantile GBDT outperforms the tuned Recurrent MDN under common causal inputs, while training the shared recurrent encoder with a mixture-density likelihood decisively beats point MSE plus homoscedastic residuals.",
+          metrics: [
+            ["Explicit-lag GBDT vs. Recurrent MDN", "-1.487 s CRPS (Holm p = 0.003)"],
+            ["Mixture-density vs. MSE on shared LSTM", "-1.630 s CRPS improvement"],
+            ["Final neural ensemble seeds", "4 seeds (42, 52, 62, 72)"]
+          ],
+          caption: "Verified paired CRPS differences on the frozen test split (402 periods, 16,950 trajectories).",
+          drawChart: function (svgEl) {
+            const ns = "http://www.w3.org/2000/svg";
+            while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+            const el = (t, a, txt) => {
+              const n = document.createElementNS(ns, t);
+              for (const [k, v] of Object.entries(a)) n.setAttribute(k, String(v));
+              if (txt !== undefined) n.textContent = txt;
+              return n;
+            };
+
+            svgEl.appendChild(el("text", { x: 20, y: 26, fill: "#F3F7FA", "font-size": 14, "font-weight": 600 }, "Paired CRPS gains relative to baselines (s)"));
+
+            const rows = [
+              { label: "Explicit-lag GBDT vs. Recurrent MDN", val: 1.487, note: "-1.487 s (p = 0.003)", color: "#287B58" },
+              { label: "Recurrent MDN vs. LSTM-MSE Gaussian", val: 1.630, note: "-1.630 s CRPS", color: "#15607A" }
+            ];
+
+            rows.forEach((r, i) => {
+              const y = 76 + i * 94;
+              svgEl.appendChild(el("text", { x: 20, y: y, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, r.label));
+              svgEl.appendChild(el("rect", { x: 20, y: y + 14, width: 500, height: 24, rx: 6, fill: "rgba(243,247,250,0.08)" }));
+              svgEl.appendChild(el("rect", { x: 20, y: y + 14, width: (r.val / 2.0) * 430, height: 24, rx: 6, fill: r.color }));
+              svgEl.appendChild(el("text", { x: 20, y: y + 56, fill: "#B6C7D2", "font-size": 13 }, "Verified reduction: " + r.note));
+            });
+          }
+        },
+        endpoints: {
+          heading: "Direct interval endpoints beat availability gating",
+          body: "Directly fitting 0.05 and 0.95 quantile endpoints avoids Gaussian tail symmetry assumptions. Combined with validation-calibrated uniform scaling, direct endpoints hit nominal coverage without discarding low-completion periods.",
+          metrics: [
+            ["Period-weighted test coverage", "0.908 (target 0.90)"],
+            ["Mean 90% interval width", "41.9 s"],
+            ["Width savings vs. availability gate", "27.3 s narrower at matched target"]
+          ],
+          caption: "Service-level interval comparison at matched validation coverage targets.",
+          drawChart: function (svgEl) {
+            const ns = "http://www.w3.org/2000/svg";
+            while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+            const el = (t, a, txt) => {
+              const n = document.createElementNS(ns, t);
+              for (const [k, v] of Object.entries(a)) n.setAttribute(k, String(v));
+              if (txt !== undefined) n.textContent = txt;
+              return n;
+            };
+
+            svgEl.appendChild(el("text", { x: 20, y: 26, fill: "#F3F7FA", "font-size": 14, "font-weight": 600 }, "Interval width at matched validation coverage"));
+            svgEl.appendChild(el("text", { x: 20, y: 48, fill: "#B6C7D2", "font-size": 12.5 }, "Direct 0.05/0.95 endpoints + uniform scaling vs. availability gate"));
+
+            svgEl.appendChild(el("text", { x: 20, y: 98, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, "Direct endpoints + uniform scaling (cov 0.908)"));
+            svgEl.appendChild(el("rect", { x: 20, y: 110, width: 500, height: 26, rx: 6, fill: "rgba(243,247,250,0.08)" }));
+            svgEl.appendChild(el("rect", { x: 20, y: 110, width: (41.9 / 80) * 460, height: 26, rx: 6, fill: "#287B58" }));
+            svgEl.appendChild(el("text", { x: 20 + (41.9 / 80) * 460 + 12, y: 128, fill: "#F3F7FA", "font-size": 13, "font-weight": 600 }, "41.9 s"));
+
+            svgEl.appendChild(el("text", { x: 20, y: 180, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, "Availability gate at common validation target"));
+            svgEl.appendChild(el("rect", { x: 20, y: 192, width: 500, height: 26, rx: 6, fill: "rgba(243,247,250,0.08)" }));
+            svgEl.appendChild(el("rect", { x: 20, y: 192, width: (41.9 / 80) * 460, height: 26, rx: 6, fill: "#15607A" }));
+            svgEl.appendChild(el("rect", { x: 20 + (41.9 / 80) * 460, y: 192, width: (27.3 / 80) * 460, height: 26, rx: 6, fill: "#AA4D45" }));
+            svgEl.appendChild(el("text", { x: 20 + ((41.9 + 27.3) / 80) * 460 + 12, y: 210, fill: "#F3F7FA", "font-size": 13, "font-weight": 600 }, "+27.3 s wider"));
+          }
+        }
+      };
+
+      const findingCopy = document.getElementById("finding-copy");
+      const findingChart = document.getElementById("finding-chart");
+      const findingCaption = document.getElementById("finding-caption");
+      const findingTabs = document.querySelectorAll(".finding-tab");
+
+      function renderFinding(key) {
+        const data = findingsData[key];
+        findingTabs.forEach((btn) => btn.setAttribute("aria-selected", String(btn.dataset.finding === key)));
+        findingCopy.innerHTML =
+          "<h3>" + data.heading + "</h3>" +
+          "<p>" + data.body + "</p>" +
+          "<ul class=\"metric-list\">" +
+          data.metrics.map(([label, val]) => "<li><span>" + label + "</span><strong>" + val + "</strong></li>").join("") +
+          "</ul>";
+        findingCaption.textContent = data.caption;
+        data.drawChart(findingChart);
+      }
+
+      findingTabs.forEach((btn) => {
+        btn.addEventListener("click", () => renderFinding(btn.dataset.finding));
+      });
+      renderFinding("lookahead");
+
+      // 3. Protocol Stage Stepper
+      const stages = {
+        split: {
+          title: "Complete-period chronological split (prepare)",
+          body: "Matched trajectories (0 < travel_time < 1000 s via 30-min forward matching) are aligned to 5-minute update periods and split strictly along complete period boundaries so no update interval straddles train, validation, or test.",
+          rows: [
+            ["Train split", "79,113 trajectories across 2,010 periods (70%)"],
+            ["Validation split", "16,943 trajectories across 350 periods (15%)"],
+            ["Held-out test split", "16,950 trajectories across 402 periods (15%)"],
+            ["Empty-window defaults", "Training-segment median and variance only"]
+          ]
+        },
+        selection: {
+          title: "Validation-only model, K*, and block-length selection",
+          body: "Snapshot and recurrent MDNs, fixed Gaussian baselines, quantile GBDTs, mixture count K* (1-SE rule), segmented-ACF block length, delay ablations, and service gating thresholds are selected solely on train/validation splits.",
+          rows: [
+            ["Neural development grid", "stage-a -> stage-b -> k-scan -> final-models"],
+            ["Reference & GBDT fits", "fixed-references, trees (snapshot & lagged), ap03"],
+            ["Diagnostics & gating", "ap01 delay ablations -> ap06 joint-gate grid"],
+            ["Resampling unit", "Unique 5-minute update periods without crossing gaps"]
+          ]
+        },
+        freeze: {
+          title: "SHA-256 selection lock and one-shot confirmatory evaluation",
+          body: "The freeze step hashes all selected checkpoints, scalers, source code, and configuration files into selection_lock.json. frozen_evaluation.py verifies every hash before scoring the test batch once.",
+          rows: [
+            ["Lock artifact", "outputs/paper_results/freeze/selection_lock.json"],
+            ["Bootstrap replicates", "5,000 moving-period-block draws (test seed 19042)"],
+            ["Support check", "Raw vs. zero-truncated CRPS, NLL, and PIT-KS"],
+            ["Latency benchmark", "scripts/benchmark_inference.py (1,000 timed CPU calls)"]
+          ]
+        },
+        extended: {
+          title: "Direct endpoints, uniform scaling, and cadence/window sensitivity",
+          body: "Post-freeze experiments evaluate directly fitted 0.05/0.95 endpoints, compare availability gating against validation-calibrated uniform scaling, retune feature ablations per variant, and span seven cadence/window pairs.",
+          rows: [
+            ["Direct endpoints & service", "r2_experiment_runner.py endpoints -> service"],
+            ["Cadence & window grid", "r2_experiment_runner.py sensitivity + r2_window5.py"],
+            ["Retuned ablations", "ablation_retuned.py (24-config grid per variant)"],
+            ["Gate selectivity diagnostic", "gate_selectivity.py (pure re-aggregation, no refit)"]
+          ]
+        }
+      };
+
+      const stageDetail = document.getElementById("stage-detail");
+      const stageTabs = document.querySelectorAll(".stage-tab");
+
+      function renderStage(key) {
+        const s = stages[key];
+        stageTabs.forEach((btn) => btn.setAttribute("aria-selected", String(btn.dataset.stage === key)));
+        stageDetail.innerHTML =
+          "<h3>" + s.title + "</h3>" +
+          "<p>" + s.body + "</p>" +
+          "<table class=\"detail-table\"><tbody>" +
+          s.rows.map(([k, v]) => "<tr><th>" + k + "</th><td>" + v + "</td></tr>").join("") +
+          "</tbody></table>";
+      }
+
+      stageTabs.forEach((btn) => {
+        btn.addEventListener("click", () => renderStage(btn.dataset.stage));
+      });
+      renderStage("split");
+
+      // 4. Copy BibTeX button
+      const copyBtn = document.getElementById("copy-bibtex");
+      const bibtexText = document.getElementById("bibtex-text");
+      copyBtn.addEventListener("click", function () {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(bibtexText.textContent).then(function () {
+            copyBtn.textContent = "Copied";
+            setTimeout(() => { copyBtn.textContent = "Copy BibTeX"; }, 1800);
+          });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
