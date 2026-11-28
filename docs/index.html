@@ -741,15 +741,15 @@
               </div>
               <div class="readout-row">
                 <span class="readout-label">Observed completions N_match</span>
-                <span class="readout-value" id="ro-nmatch">9</span>
+                <span class="readout-value" id="ro-nmatch">10</span>
               </div>
               <div class="readout-row">
                 <span class="readout-label">Completion ratio R_comp</span>
-                <span class="readout-value" id="ro-rcomp">0.750</span>
+                <span class="readout-value" id="ro-rcomp">0.833</span>
               </div>
               <div class="readout-row">
                 <span class="readout-label">Completed mean travel time</span>
-                <span class="readout-value" id="ro-bary">81.0 s</span>
+                <span class="readout-value" id="ro-bary">78.6 s</span>
               </div>
               <p class="readout-note" id="ro-note">Only vehicles completing at or before t (solid teal) enter the feature vector.</p>
             </div>
@@ -1062,14 +1062,14 @@
           }
         },
         endpoints: {
-          heading: "Direct interval endpoints beat availability gating",
-          body: "Directly fitting 0.05 and 0.95 quantile endpoints avoids Gaussian tail symmetry assumptions. Combined with validation-calibrated uniform scaling, direct endpoints hit nominal coverage without discarding low-completion periods.",
+          heading: "Uniform scaling gives narrower intervals at the gate's validation target",
+          body: "Direct 0.05 and 0.95 quantile endpoints do not assume Gaussian tail symmetry. At the reliability-first gate's validation coverage target, uniform scaling yielded narrower intervals on the held-out test set. Test coverage is reported separately, not held equal.",
           metrics: [
-            ["Period-weighted test coverage", "0.908 (target 0.90)"],
-            ["Mean 90% interval width", "41.9 s"],
-            ["Width savings vs. availability gate", "27.3 s narrower at matched target"]
+            ["Uniform scaling: test coverage / mean width", "0.973 / 60.1 s"],
+            ["Reliability-first gate: test coverage / mean width", "0.959 / 87.4 s"],
+            ["Mean width reduction with uniform scaling", "27.3 s"]
           ],
-          caption: "Service-level interval comparison at matched validation coverage targets.",
+          caption: "Held-out test results at the same validation coverage target. The separate nominal-target uniform-scaling result was 0.908 test coverage and 41.9 s mean width.",
           drawChart: function (svgEl) {
             const ns = "http://www.w3.org/2000/svg";
             while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
@@ -1080,19 +1080,26 @@
               return n;
             };
 
-            svgEl.appendChild(el("text", { x: 20, y: 26, fill: "#F3F7FA", "font-size": 14, "font-weight": 600 }, "Interval width at matched validation coverage"));
-            svgEl.appendChild(el("text", { x: 20, y: 48, fill: "#B6C7D2", "font-size": 12.5 }, "Direct 0.05/0.95 endpoints + uniform scaling vs. availability gate"));
+            const x0 = 20, plotWidth = 500;
+            const x = (seconds) => x0 + plotWidth * seconds / 100;
+            svgEl.appendChild(el("text", { x: x0, y: 26, fill: "#F3F7FA", "font-size": 14, "font-weight": 600 }, "Mean interval width at the same validation target"));
+            svgEl.appendChild(el("text", { x: x0, y: 48, fill: "#B6C7D2", "font-size": 12.5 }, "Held-out test results; coverage shown for each rule"));
 
-            svgEl.appendChild(el("text", { x: 20, y: 98, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, "Direct endpoints + uniform scaling (cov 0.908)"));
-            svgEl.appendChild(el("rect", { x: 20, y: 110, width: 500, height: 26, rx: 6, fill: "rgba(243,247,250,0.08)" }));
-            svgEl.appendChild(el("rect", { x: 20, y: 110, width: (41.9 / 80) * 460, height: 26, rx: 6, fill: "#287B58" }));
-            svgEl.appendChild(el("text", { x: 20 + (41.9 / 80) * 460 + 12, y: 128, fill: "#F3F7FA", "font-size": 13, "font-weight": 600 }, "41.9 s"));
+            [
+              { label: "Uniform scaling", coverage: 0.973, width: 60.144, y: 94, color: "#287B58" },
+              { label: "Reliability-first gate", coverage: 0.959, width: 87.434, y: 172, color: "#AA4D45" }
+            ].forEach(({ label, coverage, width, y, color }) => {
+              svgEl.appendChild(el("text", { x: x0, y, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, label + " (test coverage " + coverage.toFixed(3) + ")"));
+              svgEl.appendChild(el("rect", { x: x0, y: y + 12, width: plotWidth, height: 26, rx: 6, fill: "rgba(243,247,250,0.08)" }));
+              svgEl.appendChild(el("rect", { x: x0, y: y + 12, width: x(width) - x0, height: 26, rx: 6, fill: color }));
+              svgEl.appendChild(el("text", { x: x(width) + 10, y: y + 30, fill: "#F3F7FA", "font-size": 13, "font-weight": 600 }, width.toFixed(1) + " s"));
+            });
 
-            svgEl.appendChild(el("text", { x: 20, y: 180, fill: "#F3F7FA", "font-size": 13.5, "font-weight": 500 }, "Availability gate at common validation target"));
-            svgEl.appendChild(el("rect", { x: 20, y: 192, width: 500, height: 26, rx: 6, fill: "rgba(243,247,250,0.08)" }));
-            svgEl.appendChild(el("rect", { x: 20, y: 192, width: (41.9 / 80) * 460, height: 26, rx: 6, fill: "#15607A" }));
-            svgEl.appendChild(el("rect", { x: 20 + (41.9 / 80) * 460, y: 192, width: (27.3 / 80) * 460, height: 26, rx: 6, fill: "#AA4D45" }));
-            svgEl.appendChild(el("text", { x: 20 + ((41.9 + 27.3) / 80) * 460 + 12, y: 210, fill: "#F3F7FA", "font-size": 13, "font-weight": 600 }, "+27.3 s wider"));
+            svgEl.appendChild(el("line", { x1: x0, x2: x(100), y1: 232, y2: 232, stroke: "#B6C7D2" }));
+            [0, 25, 50, 75, 100].forEach((tick) => {
+              svgEl.appendChild(el("line", { x1: x(tick), x2: x(tick), y1: 232, y2: 237, stroke: "#B6C7D2" }));
+              svgEl.appendChild(el("text", { x: x(tick), y: 255, "text-anchor": "middle", fill: "#B6C7D2", "font-size": 12 }, tick === 100 ? "100 s" : String(tick)));
+            });
           }
         }
       };
